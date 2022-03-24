@@ -85,3 +85,7 @@ console.log(iteration)
 // second iteration : correct matching
 // third iteration : not progressing
 ```
+
+# Thanks
+
+Special thanks to Gabriel Peyré and Victor Magron
