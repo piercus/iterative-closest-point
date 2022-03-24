@@ -1,0 +1,60 @@
+{
+  "name": "iterative-closest-point",
+  "version": "1.0.0",
+  "description": "Iterative Closest Point Implementation",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava && xo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/piercus/iterative-closest-point.git"
+  },
+  "xo": {
+    "rules": {
+      "unicorn/prefer-module": 0
+    }
+  },
+  "release": {
+    "branches": [
+      "master"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/npm",
+      "@semantic-release/github",
+      "@semantic-release/git"
+    ]
+  },
+  "keywords": [
+    "iterative",
+    "closest",
+    "point",
+    "ict",
+    "optimal",
+    "transport",
+    "transportation",
+    "iterative",
+    "corresponding",
+    "point",
+    "corresponding",
+    "cloud",
+    "match",
+    "rotation",
+    "2d",
+    "3d"
+  ],
+  "author": "Pierre Colle <piercus@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/piercus/iterative-closest-point/issues"
+  },
+  "homepage": "https://github.com/piercus/iterative-closest-point#readme",
+  "devDependencies": {
+    "ava": "^4.1.0",
+    "munkres-js": "^1.2.2",
+    "semantic-release": "^19.0.2",
+    "xo": "^0.48.0"
+  }
+}
