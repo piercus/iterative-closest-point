@@ -25,19 +25,24 @@ const diff = (s,d) => d - s;
 ```js
 const munkres = require('munkres-js');
 
-const match = function(sourceListTranslated, destinationList){
-	const diffMat = sourceListTranslated.map(a => destinationList.map(b => diff(a,b)))
-	const costs = sourceListTranslated.map(a => destinationList.map(b => Math.abs(diff(a,b))))
-	
-	const assignement = munkres(costs)
-	const cost = sum(assignement.map(([i,j]) => costs[i][j]));
-	
+const transform = function ({translation}, b) {
+	return b + translation;
+};
+
+const match = function ({source, destination, state}) {
+	// state is {translation}
+	const transformedSource = source.map(a => transform(state, a))
+	const diffMat = transformedSource.map(a => destination.map(b => diff(a, b)));
+	const costs = transformedSource.map(a => destination.map(b => Math.abs(diff(a, b))));
+
+	const assignement = munkres(costs);
+	const cost = sum(assignement.map(([i, j]) => costs[i][j]));
 	return {
-		cost,// mandatory
-		assignement,// mandatory
-		diffs: assignement.map(([i,j]) => diffMat[i][j]) // custom key, we reuse it in estimate
-	}
-}
+		cost, // Mandatory
+		assignement, // Mandatory
+		diffs: assignement.map(([i, j]) => diffMat[i][j]), // Custom key, we reuse it in updateFn
+	};
+};
 ```
 
 ### estimate
@@ -45,45 +50,44 @@ const match = function(sourceListTranslated, destinationList){
 ```js
 const sum = list => list.reduce((a,b) => a+b, 0);
 
-const estimate = function({diffs}){
-	const translation = sum(diffs)/diffs.length;
+// this function estimate the state
+const estimate = function ({diffs, state}) {
+
+	if (diffs.length === 0) {
+		throw (new Error('empty diffs'));
+	}
+
+	const translation = sum(diffs) / diffs.length + state.translation;
 	return {
-		translation: translation
-	} // this object will be the input of transformFn
-}
+		translation,
+	}; // This object will be the input of transformFn
+};
 ```
 
-### transform
 
-```js
-const transform = function({translation}, b){
-	return b + translation;
-}
-```
 ### all together
 
 ```js
-const Ict = require('iterative-closest-point');
-
-const sourceList = [1,2,3,4,5,6];
-const destinationList = [8,9,10,11,12,13];
 
 const ict = new Ict({
-	estimate,
+	init: {translation: 0}, // initialize the state
 	transform,
-	match
+	estimate,
+	match,
+	threshold: 1
 });
 
-const {transformation, assignement, iteration} = ict.run(source,destination);
+const sourceList = [1, 2, 3, 4, 5, 6];
+const destinationList = [8, 9, 10, 11, 12, 13];
+const {translation, assignement, iteration, cost} = await ict.run(sourceList, destinationList);
 
 console.log(transformation)
 // {translation: 7}
 console.log(iteration)
-// 3
+// 2
 // Explanation : 
 // first iteration : basic matching
 // second iteration : correct matching
-// third iteration : not progressing
 ```
 
 # Thanks

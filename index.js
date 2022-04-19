@@ -1,74 +1,53 @@
-const uniq = array => array.filter((item, index) => array.indexOf(item) === index);
+const huge = 1e10;
 
-const defaultTransformationReducer = (a, b) => {
-	if (typeof (a) === 'object' && !Array.isArray(a)) {
-		const normB = b || {};
-		const keys = uniq(Object.keys(a).concat(Object.keys(normB)));
-		const out = {};
-		for (const k of keys) {
-			out[k] = defaultTransformationReducer(a[k], normB[k]);
-		}
-
-		return out;
-	}
-
-	if (typeof (a) === 'number') {
-		const normB = b || 0;
-		return a + normB;
-	}
-
-	throw (new Error('iterative-closest-point: transformation type is not implemented, please consider using opts.reduceTransformation argument'));
+const defaultLogger = {
+	error: console.log,
+	warn: console.log,
+	info: console.log,
+	debug() {},
 };
 
 class Ict {
 	constructor({
 		match,
-		transform,
 		estimate,
+		init = null,
 		threshold = null,
-		maxIter = null,
-		reduceTransformation = null,
+		maxIter = 10,
+		logger = defaultLogger,
 	}) {
 		this.match = match;
-		this.transform = transform;
 		this.estimate = estimate;
 		this.threshold = threshold;
 		this.maxIter = maxIter;
-		this.reduceTransformation = reduceTransformation || defaultTransformationReducer;
+		this.init = init;
+		this.logger = logger;
 	}
 
 	run(source, destination) {
-		let lastCost = null;
-		let cost = null;
-		let iteration = 0;
-		let transformedSource = source;
-		let output = null;
-		let transformation = null;
-		while (
-			(lastCost === null || lastCost > cost)
-			&& (typeof (this.threshold) !== 'number' || cost > this.threshold)
-			&& (typeof (this.maxIter) !== 'number' || iteration < this.maxIter)
-		) {
-			const iterOutput = this.iter({transformedSource, destination});
-
-			transformedSource = iterOutput.transformedSource;
-			transformation = this.reduceTransformation(iterOutput.transformation, transformation);
-			iteration++;
-			lastCost = cost;
-			cost = iterOutput.cost;
-			output = iterOutput;
-		}
-
-		return Object.assign({iteration}, output, {transformation});
+		return this.recursiveRun({
+			source, destination, iteration: 0, cost: huge, state: this.init,
+		});
 	}
 
-	iter({transformedSource, destination}) {
-		const matchOutput = this.match(transformedSource, destination);
-		const {assignement, cost} = matchOutput;
-		const transformation2 = this.estimate(matchOutput);
-		const transformedSource2 = transformedSource.map(s => this.transform(transformation2, s));
+	recursiveRun({source, destination, iteration, cost, state}) {
+		if ((typeof (this.threshold) === 'number' && cost < this.threshold) || (typeof (this.maxIter) === 'number' && iteration >= this.maxIter)) {
+			return Object.assign({iteration}, state);
+		}
 
-		return Object.assign({}, {cost, assignement, transformation: transformation2}, {transformedSource: transformedSource2});
+		return this.iter({source, destination, state}).then(iterOutput => {
+			const newCost = iterOutput.cost;
+			this.logger.debug(`${iteration} cost: ${newCost}`);
+			return this.recursiveRun({source, destination, iteration: iteration + 1, cost: newCost, state: Object.assign({}, state, iterOutput)});
+		});
+	}
+
+	iter({source, destination, state}) {
+		return Promise.resolve(this.match({source, destination, state, logger: this.logger})).then(matchOutput => {
+			const {assignement, cost} = matchOutput;
+			const estimateInput = Object.assign({source, destination, state, logger: this.logger}, matchOutput);
+			return Promise.resolve(this.estimate(estimateInput)).then(transformation => Object.assign({cost, assignement}, transformation));
+		});
 	}
 }
 
