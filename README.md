@@ -2,7 +2,7 @@
 
 Customizable Iterative-Closest-Point simple implementation in JS.
 
-See (Iterative Closest Point)[https://en.wikipedia.org/wiki/Iterative_closest_point]
+See [Iterative Closest Point](https://en.wikipedia.org/wiki/Iterative_closest_point)
 
 ## Installation
 
