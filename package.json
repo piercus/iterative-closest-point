@@ -4,7 +4,8 @@
   "description": "Iterative Closest Point Implementation",
   "main": "index.js",
   "scripts": {
-    "test": "ava && xo"
+    "test": "ava && xo",
+    "semantic-release": "semantic-release",
   },
   "repository": {
     "type": "git",
