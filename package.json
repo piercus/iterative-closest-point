@@ -57,8 +57,5 @@
     "munkres-js": "^1.2.2",
     "semantic-release": "^19.0.2",
     "xo": "^0.48.0"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
   }
 }
