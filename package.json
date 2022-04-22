@@ -59,6 +59,6 @@
     "xo": "^0.48.0"
   },
   "publishConfig": {
-    "registry": "https://npm.iterative-closest-point.github.com"
+    "registry": "https://npm.pkg.github.com"
   }
 }
