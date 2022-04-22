@@ -9,7 +9,9 @@ jobs:
         with:
           node-version: '12.x'
       - run: npm ci
+        uses: ./
       - run: npm test
+        uses: ./
   deploy:
     needs: test
     runs-on: ubuntu-latest
