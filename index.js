@@ -35,17 +35,17 @@ class Ict {
 			return Object.assign({iteration}, state);
 		}
 
-		return this.iter({source, destination, state}).then(iterOutput => {
+		return this.iter({source, destination, state, iteration}).then(iterOutput => {
 			const newCost = iterOutput.cost;
 			this.logger.debug(`${iteration} cost: ${newCost}`);
 			return this.recursiveRun({source, destination, iteration: iteration + 1, cost: newCost, state: Object.assign({}, state, iterOutput)});
 		});
 	}
 
-	iter({source, destination, state}) {
-		return Promise.resolve(this.match({source, destination, state, logger: this.logger})).then(matchOutput => {
+	iter({source, destination, state, iteration}) {
+		return Promise.resolve(this.match({source, destination, state, logger: this.logger, iteration})).then(matchOutput => {
 			const {assignement, cost} = matchOutput;
-			const estimateInput = Object.assign({source, destination, state, logger: this.logger}, matchOutput);
+			const estimateInput = Object.assign({source, destination, state, logger: this.logger, iteration}, matchOutput);
 			return Promise.resolve(this.estimate(estimateInput)).then(transformation => Object.assign({cost, assignement}, transformation));
 		});
 	}

@@ -29,7 +29,7 @@ const transform = function ({translation}, b) {
 	return b + translation;
 };
 
-const match = function ({source, destination, state}) {
+const match = function ({source, destination, state, iteration}) {
 	// state is {translation}
 	const transformedSource = source.map(a => transform(state, a))
 	const diffMat = transformedSource.map(a => destination.map(b => diff(a, b)));
@@ -51,7 +51,7 @@ const match = function ({source, destination, state}) {
 const sum = list => list.reduce((a,b) => a+b, 0);
 
 // this function estimate the state
-const estimate = function ({diffs, state}) {
+const estimate = function ({diffs, state, iteration}) {
 
 	if (diffs.length === 0) {
 		throw (new Error('empty diffs'));
