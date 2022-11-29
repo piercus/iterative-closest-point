@@ -69,7 +69,7 @@ const estimate = function ({diffs, state, iteration}) {
 
 ```js
 
-const ict = new Ict({
+const icp = new Icp({
 	init: {translation: 0}, // initialize the state
 	transform,
 	estimate,
