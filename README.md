@@ -71,7 +71,6 @@ const estimate = function ({diffs, state, iteration}) {
 
 const icp = new Icp({
 	init: {translation: 0}, // initialize the state
-	transform,
 	estimate,
 	match,
 	threshold: 1
